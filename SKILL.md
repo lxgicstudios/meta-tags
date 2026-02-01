@@ -1,97 +1,105 @@
 ---
-name: Meta Tags Generator CLI
-description: Generate SEO meta tags, Open Graph, Twitter Cards. Validate existing tags. Bulk process HTML files. Free SEO tool.
-tags: [seo, meta-tags, open-graph, twitter-cards, html, cli, marketing]
+name: Meta Tags - SEO Tag Generator
+description: Generate HTML meta tags for SEO, Open Graph, Twitter Cards, JSON-LD. Copy-paste ready. Perfect for web developers. Free CLI tool.
 ---
 
-# Meta Tags Generator CLI
+# Meta Tags
 
-Generate perfect meta tags for SEO and social sharing.
+Generate complete meta tags for SEO. HTML, Open Graph, Twitter Cards, JSON-LD schema.
 
-**Open Graph. Twitter Cards. Schema.org. All in one.**
-
-## Quick Start
+## Installation
 
 ```bash
 npm install -g @lxgicstudios/meta-tags
 ```
 
+## Basic Usage
+
 ```bash
-# Generate meta tags
-meta-tags generate --title "My Page" --description "Page description"
-
-# Validate existing page
-meta-tags validate https://example.com
-
-# Bulk process HTML files
-meta-tags inject ./pages/*.html --config meta.json
+npx @lxgicstudios/meta-tags -t "Page Title" -d "Description" -u "https://example.com"
 ```
-
-## What It Generates
-
-### Basic SEO
-- Title tag (optimized length)
-- Meta description
-- Canonical URL
-- Robots directives
-
-### Open Graph
-- og:title, og:description
-- og:image, og:url
-- og:type, og:site_name
-
-### Twitter Cards
-- twitter:card
-- twitter:title, twitter:description
-- twitter:image
-- twitter:site, twitter:creator
-
-### Schema.org (JSON-LD)
-- Article, Product, Organization
-- BreadcrumbList
-- FAQPage, HowTo
 
 ## Commands
 
+### Generate All Tags
+
 ```bash
-# Interactive generator
-meta-tags generate -i
-
-# From JSON config
-meta-tags generate --config page-meta.json
-
-# Validate and suggest fixes
-meta-tags validate index.html --fix
-
-# Preview how it looks on social
-meta-tags preview https://example.com
-
-# Bulk inject into HTML
-meta-tags inject ./build/*.html --config seo.json
-
-# Extract existing tags
-meta-tags extract https://example.com -o meta.json
+meta-tags -t "My Website" -d "Welcome to my site" -u "https://example.com"
 ```
 
-## Config File Example
+### With Social Image
 
-```json
-{
-  "title": "My Awesome Page",
-  "description": "A great description under 160 chars",
-  "image": "https://example.com/og.png",
-  "url": "https://example.com/page",
-  "type": "article"
-}
+```bash
+meta-tags -t "Blog Post" -d "Great article" -i "https://example.com/image.jpg"
 ```
 
-## When to Use This
+### Article Type
 
-- Pre-launch SEO check
-- Social share optimization
-- Bulk meta tag updates
-- SEO audits
-- Content publishing workflows
+```bash
+meta-tags -t "How to Code" --type article --author "John Doe" --published "2024-01-15"
+```
+
+### From Config File
+
+```bash
+meta-tags --config seo.json -o head.html
+```
+
+## Options
+
+| Option | Description |
+|--------|-------------|
+| `-t, --title` | Page title (required) |
+| `-d, --description` | Meta description |
+| `-u, --url` | Canonical URL |
+| `-i, --image` | OG/Twitter image |
+| `-k, --keywords` | Keywords (comma-separated) |
+| `--site-name` | Website name |
+| `--twitter` | Twitter handle |
+| `--type` | OG type: website, article, product |
+| `--format` | html, json, react, vue |
+
+## Output Example
+
+```html
+<!-- Primary Meta Tags -->
+<title>My Website</title>
+<meta name="description" content="Welcome...">
+<link rel="canonical" href="https://example.com">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="My Website">
+<meta property="og:image" content="https://...">
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image">
+<meta property="twitter:title" content="My Website">
+
+<!-- JSON-LD -->
+<script type="application/ld+json">...</script>
+```
+
+## Output Formats
+
+```bash
+meta-tags -t "Title" --format html   # Default
+meta-tags -t "Title" --format json   # JSON
+meta-tags -t "Title" --format react  # React Helmet
+meta-tags -t "Title" --format vue    # Vue useHead
+```
+
+## Common Use Cases
+
+**Blog post tags:**
+```bash
+meta-tags -t "My Article" -d "Description" -i "cover.jpg" --type article --author "Me"
+```
+
+**Generate for Next.js:**
+```bash
+meta-tags -t "Page" --format react -o metadata.tsx
+```
 
 ---
 
