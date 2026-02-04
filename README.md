@@ -136,15 +136,78 @@ const html = generate({
 console.log(html);
 ```
 
+## 2026 SEO Features
+
+### AI Search Optimization
+
+Make your content AI-crawler friendly (GPTBot, Claude-Web, CCBot):
+
+```bash
+meta-tags -t "My Page" -d "Description" --ai-friendly
+```
+
+### FAQ Schema (High value for AI citations)
+
+```bash
+# Create faq.json
+[
+  {"question": "What is X?", "answer": "X is..."},
+  {"question": "How does Y work?", "answer": "Y works by..."}
+]
+
+meta-tags -t "FAQ Page" --type faq --faq faq.json
+```
+
+### HowTo Schema
+
+```bash
+# Create steps.json
+[
+  {"name": "Step 1", "text": "First, do this..."},
+  {"name": "Step 2", "text": "Then, do that..."}
+]
+
+meta-tags -t "How to Build X" --type howto --howto steps.json
+```
+
+### Product Schema with Ratings
+
+```bash
+meta-tags -t "My Product" --type product --price 29.99 --currency USD --rating 4.5 --rating-count 123
+```
+
+### Breadcrumb Navigation
+
+```bash
+# Create breadcrumbs.json
+[
+  {"name": "Home", "url": "https://example.com"},
+  {"name": "Products", "url": "https://example.com/products"},
+  {"name": "Widget", "url": "https://example.com/products/widget"}
+]
+
+meta-tags -t "Widget" --breadcrumbs breadcrumbs.json
+```
+
+### Speakable Specification (Voice/AI assistants)
+
+```bash
+meta-tags -t "News Article" --type article --speakable
+```
+
 ## Why meta-tags?
 
 - **Complete** - All essential tags in one command
+- **2026 Ready** - AI search optimization, FAQ/HowTo schemas, Speakable
 - **Framework support** - React, Vue, plain HTML
-- **JSON-LD included** - Schema.org markup
+- **JSON-LD included** - Schema.org markup for rich results
 - **Copy-paste ready** - Just paste into your `<head>`
 
 ---
 
 **Built by [LXGIC Studios](https://lxgicstudios.com)**
 
-🔗 [GitHub](https://github.com/lxgicstudios/meta-tags) · [Twitter](https://x.com/lxgicstudios)
+GitHub: https://github.com/lxgicstudios
+Twitter: https://x.com/lxgicstudios
+
+Want more free tools like this? We have 100+ on our GitHub: github.com/lxgicstudios

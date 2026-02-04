@@ -6,7 +6,7 @@ const { generate, generateFromConfig } = require('../src/index');
 const args = process.argv.slice(2);
 
 const HELP = `
-meta-tags - SEO Meta Tag Generator
+meta-tags - SEO Meta Tag Generator (2026 Edition)
 
 USAGE
   meta-tags [options]
@@ -21,11 +21,22 @@ OPTIONS
   -k, --keywords <str>       Keywords (comma-separated)
   --site-name <str>          Site name
   --twitter <str>            Twitter handle (@username)
-  --type <str>               OG type: website, article, product
+  --type <str>               Schema type: website, article, product, faq, howto, organization
   --author <str>             Article author
   --published <str>          Published date (ISO)
   --robots <str>             Robots directive
   --locale <str>             Locale (e.g., en_US)
+
+ADVANCED SEO (2026)
+  --ai-friendly              Add AI crawler optimization hints
+  --speakable                Add SpeakableSpecification for voice/AI assistants
+  --faq <file>               FAQ items JSON file [{question, answer}]
+  --howto <file>             HowTo steps JSON file [{name, text}]
+  --breadcrumbs <file>       Breadcrumb items JSON [{name, url}]
+  --price <num>              Product price (requires --type product)
+  --currency <str>           Currency code (default: USD)
+  --rating <num>             Product rating (1-5)
+  --rating-count <num>       Number of reviews
 
 OUTPUT OPTIONS
   -o, --output <file>        Output to file
@@ -38,7 +49,9 @@ OUTPUT OPTIONS
 EXAMPLES
   meta-tags -t "My Page" -d "Description" -u "https://example.com"
   meta-tags --config seo.json -o head.html
-  meta-tags -t "Blog Post" --type article --author "John Doe"
+  meta-tags -t "Blog Post" --type article --author "John Doe" --ai-friendly
+  meta-tags -t "FAQ Page" --type faq --faq faq.json
+  meta-tags -t "Tutorial" --type howto --howto steps.json --speakable
 
 LXGIC Studios | https://lxgicstudios.com
 `;
@@ -72,6 +85,42 @@ async function main() {
       process.exit(1);
     }
   } else {
+    // Load JSON files for advanced schema types
+    const faqFile = getOption('--faq', null);
+    const howtoFile = getOption('--howto', null);
+    const breadcrumbsFile = getOption('--breadcrumbs', null);
+
+    let faqItems = [];
+    let howToSteps = [];
+    let breadcrumbs = [];
+
+    if (faqFile) {
+      try {
+        faqItems = JSON.parse(fs.readFileSync(faqFile, 'utf-8'));
+      } catch (e) {
+        console.error(`Error reading FAQ file: ${e.message}`);
+        process.exit(1);
+      }
+    }
+
+    if (howtoFile) {
+      try {
+        howToSteps = JSON.parse(fs.readFileSync(howtoFile, 'utf-8'));
+      } catch (e) {
+        console.error(`Error reading HowTo file: ${e.message}`);
+        process.exit(1);
+      }
+    }
+
+    if (breadcrumbsFile) {
+      try {
+        breadcrumbs = JSON.parse(fs.readFileSync(breadcrumbsFile, 'utf-8'));
+      } catch (e) {
+        console.error(`Error reading breadcrumbs file: ${e.message}`);
+        process.exit(1);
+      }
+    }
+
     config = {
       title: getOption('--title', '-t'),
       description: getOption('--description', '-d'),
@@ -83,8 +132,17 @@ async function main() {
       type: getOption('--type', null, 'website'),
       author: getOption('--author', null),
       published: getOption('--published', null),
-      robots: getOption('--robots', null),
-      locale: getOption('--locale', null, 'en_US')
+      robots: getOption('--robots', null) || 'index, follow',
+      locale: getOption('--locale', null, 'en_US'),
+      // 2026 SEO additions
+      faqItems,
+      howToSteps,
+      breadcrumbs,
+      price: getOption('--price', null),
+      currency: getOption('--currency', null, 'USD'),
+      rating: getOption('--rating', null),
+      ratingCount: getOption('--rating-count', null),
+      speakable: hasFlag('--speakable', null)
     };
   }
 
@@ -98,6 +156,7 @@ async function main() {
     includeOG: !hasFlag('--no-og', null),
     includeTwitter: !hasFlag('--no-twitter', null),
     includeJsonLD: !hasFlag('--no-jsonld', null),
+    includeAICrawlerHints: hasFlag('--ai-friendly', null),
     format: getOption('--format', '-f', 'html')
   };
 

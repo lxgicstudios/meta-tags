@@ -17,13 +17,25 @@ function generate(config, options = {}) {
     robots = 'index, follow',
     locale = 'en_US',
     themeColor = '',
-    favicon = ''
+    favicon = '',
+    // New 2026 SEO fields
+    faqItems = [],
+    howToSteps = [],
+    breadcrumbs = [],
+    price = '',
+    currency = 'USD',
+    availability = 'InStock',
+    rating = '',
+    ratingCount = '',
+    speakable = false,
+    organization = null
   } = config;
 
   const {
     includeOG = true,
     includeTwitter = true,
     includeJsonLD = true,
+    includeAICrawlerHints = false,
     format = 'html'
   } = options;
 
@@ -95,6 +107,15 @@ function generateHTML(config, options) {
   
   if (themeColor) {
     lines.push(`<meta name="theme-color" content="${escapeAttr(themeColor)}">`);
+  }
+
+  // AI Crawler Hints (2026 best practice)
+  if (options.includeAICrawlerHints) {
+    lines.push('');
+    lines.push(`<!-- AI Search Optimization -->`);
+    lines.push(`<meta name="robots" content="max-snippet:-1, max-image-preview:large, max-video-preview:-1">`);
+    lines.push(`<!-- Allow AI crawlers: GPTBot, Claude-Web, CCBot -->`);
+    lines.push(`<!-- Ensure robots.txt also allows these user agents -->`);
   }
 
   // Open Graph
@@ -185,11 +206,24 @@ function buildJsonLD(config) {
     author,
     published,
     modified,
-    siteName
+    siteName,
+    faqItems = [],
+    howToSteps = [],
+    breadcrumbs = [],
+    price,
+    currency = 'USD',
+    availability = 'InStock',
+    rating,
+    ratingCount,
+    speakable,
+    organization
   } = config;
 
+  const schemas = [];
+
+  // Article schema
   if (type === 'article') {
-    return {
+    const article = {
       "@context": "https://schema.org",
       "@type": "Article",
       "headline": title,
@@ -207,16 +241,128 @@ function buildJsonLD(config) {
         "name": siteName
       } : undefined
     };
+    
+    // Add SpeakableSpecification for AI/voice assistants
+    if (speakable) {
+      article.speakable = {
+        "@type": "SpeakableSpecification",
+        "cssSelector": ["article", "h1", "h2", ".summary", ".key-points"]
+      };
+    }
+    
+    schemas.push(article);
   }
 
-  return {
-    "@context": "https://schema.org",
-    "@type": "WebPage",
-    "name": title,
-    "description": description || undefined,
-    "url": url || undefined,
-    "image": image || undefined
-  };
+  // FAQ schema (high value for AI search citations)
+  if (type === 'faq' || faqItems.length > 0) {
+    schemas.push({
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": faqItems.map(item => ({
+        "@type": "Question",
+        "name": item.question,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": item.answer
+        }
+      }))
+    });
+  }
+
+  // HowTo schema
+  if (type === 'howto' || howToSteps.length > 0) {
+    schemas.push({
+      "@context": "https://schema.org",
+      "@type": "HowTo",
+      "name": title,
+      "description": description || undefined,
+      "image": image || undefined,
+      "step": howToSteps.map((step, i) => ({
+        "@type": "HowToStep",
+        "position": i + 1,
+        "name": step.name || `Step ${i + 1}`,
+        "text": step.text || step
+      }))
+    });
+  }
+
+  // Product schema
+  if (type === 'product' && price) {
+    const product = {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      "name": title,
+      "description": description || undefined,
+      "image": image || undefined,
+      "offers": {
+        "@type": "Offer",
+        "price": price,
+        "priceCurrency": currency,
+        "availability": `https://schema.org/${availability}`
+      }
+    };
+    
+    if (rating && ratingCount) {
+      product.aggregateRating = {
+        "@type": "AggregateRating",
+        "ratingValue": rating,
+        "reviewCount": ratingCount
+      };
+    }
+    
+    schemas.push(product);
+  }
+
+  // Organization schema
+  if (type === 'organization' || organization) {
+    const org = organization || {};
+    schemas.push({
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": org.name || siteName || title,
+      "url": org.url || url || undefined,
+      "logo": org.logo || image || undefined,
+      "sameAs": org.sameAs || undefined
+    });
+  }
+
+  // Breadcrumb schema
+  if (breadcrumbs.length > 0) {
+    schemas.push({
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": breadcrumbs.map((crumb, i) => ({
+        "@type": "ListItem",
+        "position": i + 1,
+        "name": crumb.name,
+        "item": crumb.url
+      }))
+    });
+  }
+
+  // Default WebPage schema
+  if (schemas.length === 0 || (type === 'website' && schemas.length === 0)) {
+    const webpage = {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": title,
+      "description": description || undefined,
+      "url": url || undefined,
+      "image": image || undefined
+    };
+    
+    if (speakable) {
+      webpage.speakable = {
+        "@type": "SpeakableSpecification",
+        "cssSelector": ["h1", "h2", ".summary", "main p:first-of-type"]
+      };
+    }
+    
+    schemas.push(webpage);
+  }
+
+  // Return single schema or array
+  return schemas.length === 1 ? schemas[0] : schemas;
 }
 
 function buildTagsObject(config, options) {
