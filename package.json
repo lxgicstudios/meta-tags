@@ -1,7 +1,7 @@
 {
   "name": "@lxgicstudios/meta-tags",
-  "version": "1.0.0",
-  "description": "Generate perfect meta tags for SEO. HTML meta, Open Graph, Twitter Cards, JSON-LD. Copy-paste ready.",
+  "version": "1.0.1",
+  "description": "Generate perfect meta tags for SEO. HTML meta, Open Graph, Twitter Cards, JSON-LD schema markup. Copy-paste ready.",
   "main": "src/index.js",
   "bin": {
     "meta-tags": "./bin/cli.js"
@@ -10,15 +10,27 @@
     "test": "node test/test.js"
   },
   "keywords": [
-    "meta",
-    "seo",
-    "opengraph",
-    "twitter",
+    "cli",
+    "developer-tools",
+    "facebook",
+    "generator",
+    "html",
+    "json-ld",
     "jsonld",
+    "linkedin",
+    "meta",
+    "npx",
+    "og-tags",
+    "open-graph",
+    "opengraph",
     "schema",
-    "generator"
+    "seo",
+    "social-media",
+    "structured-data",
+    "twitter",
+    "twitter-cards"
   ],
-  "author": "LXGIC Studios <lxgicstudios@gmail.com>",
+  "author": "LXGIC Studios <hello@lxgicstudios.com> (https://lxgicstudios.com)",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -28,7 +40,19 @@
   "bugs": {
     "url": "https://github.com/lxgicstudios/meta-tags/issues"
   },
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/lxgicstudios"
+  },
   "engines": {
     "node": ">=16.0.0"
-  }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "src",
+    "bin",
+    "README.md"
+  ]
 }
